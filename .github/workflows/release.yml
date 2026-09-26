@@ -21,19 +21,19 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-          cache-dependency-path: '/tampermonkey-react/package-lock.json' # Points to the package-lock inside /test
+          cache-dependency-path: 'tampermonkey-react/package-lock.json'
 
       - name: Install dependencies
-        working-directory: ./tampermonkey-react # Runs inside the /test subfolder
+        working-directory: ./tampermonkey-react
         run: npm ci
 
       - name: Build userscript
-        working-directory: ./tampermonkey-react # Runs inside the /test subfolder
+        working-directory: ./tampermonkey-react
         run: npm run build
 
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: tampermonkey-react/dist/*.user.js # Points to dist inside the /test subfolder
+          files: tampermonkey-react/dist/*.user.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
