@@ -1,0 +1,39 @@
+name: Build and Release Userscript
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers when you push a tag like v1.0.0
+
+permissions:
+  contents: write # Grants permission to create GitHub Releases
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: '/tampermonkey-react/package-lock.json' # Points to the package-lock inside /test
+
+      - name: Install dependencies
+        working-directory: ./tampermonkey-react # Runs inside the /test subfolder
+        run: npm ci
+
+      - name: Build userscript
+        working-directory: ./tampermonkey-react # Runs inside the /test subfolder
+        run: npm run build
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tampermonkey-react/dist/*.user.js # Points to dist inside the /test subfolder
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
